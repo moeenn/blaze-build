@@ -1,0 +1,29 @@
+version: '3'
+
+vars:
+  MAIN: ./cmd/blazebuild/blazebuild.go
+
+tasks:
+  lint:
+    cmds:
+      - golangci-lint run ./...
+
+  test:
+    cmds:
+      - go test ./...
+
+  # usage: FILTER=^TestSomething$ task test:filter
+  "test:filter":
+    cmds:
+      - go test -run $FILTER -v ./...
+
+  run:
+    cmds:
+      - task: lint
+      - go run {{.MAIN}}
+
+  build:
+    cmds:
+      - task: lint
+      - task: test
+      - go build -o ./bin/blazebuild {{.MAIN}}
